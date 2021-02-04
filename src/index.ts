@@ -1,6 +1,7 @@
 import "./config/config";
 import Server from "./server/server";
 import MongoDB from "./database/mongodb";
+import indexRouter from "./routes";
 
 
 
@@ -17,10 +18,7 @@ mongoDB.connect(urlDB);
 express.start();
 
 
-express.app.get("/", (req, res) => {
-  res.json({ exito: true, msg : "Hola mundo" });
-});
-
+express.app.use('/api',indexRouter);
 
 
 express.app.listen(port, () => {
