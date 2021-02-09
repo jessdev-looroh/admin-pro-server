@@ -23,54 +23,57 @@ class MedicoController {
 
   eliminarMedico(req: Request, res: Response) {
     const uid = req.params.id;
-    // Medico.findByIdAndUpdate(uid, { estado: false },{new:true}).exec((err, Medico) => {
-    //   if (err) {
-    //     return res.status(500).json({
-    //       exito: false,
-    //       err,
-    //     });
-    //   }
-    //   if (Medico)
-    return res.json({
-      exito: true,
-      msg: "El Medico ha sido eliminado correctamente!!",
-    });
+    Medico.findByIdAndRemove(uid).exec(
+      (err, medico) => {
+        if (err) {
+          return res.status(500).json({
+            exito: false,
+            err,
+          });
+        }
+        if (medico)
+          return res.json({
+            exito: true,
+            medico,
+            msg: "El Medico ha sido eliminado correctamente!!",
+          });
 
-    //   return res.status(401).json({
-    //     exito: false,
-    //     err: {
-    //       msg: "No existe un Medico con este ID",
-    //     },
-    //   });
-    // });
+        return res.status(401).json({
+          exito: false,
+          err: {
+            msg: "No existe un Medico con este ID",
+          },
+        });
+      }
+    );
   }
 
   actualizarMedico(req: Request, res: Response) {
-    const { nombre } = req.body;
+    const { nombre, hospital } = req.body;
     const uid = req.params.id;
 
-    // Medico.findByIdAndUpdate(uid, { nombre }, { new: true }).exec(
-    //   (err, Medico) => {
-    //     if (err) {
-    //       return res.status(500).json({
-    //         exito: false,
-    //         err,
-    //       });
-    //     }
-    //     if (Medico)
-    return res.json({
-      exito: true,
-      Medico: "h",
-    });
+    Medico.findByIdAndUpdate(uid, { nombre, hospital }, { new: true }).exec(
+      (err, medico) => {
+        if (err) {
+          return res.status(500).json({
+            exito: false,
+            err,
+          });
+        }
+        if (medico)
+          return res.json({
+            exito: true,
+            medico,
+          });
 
-    //     return res.status(401).json({
-    //       exito: false,
-    //       err: {
-    //         msg: "No existe un Medico con este ID",
-    //       },
-    //     });
-    //   }
-    // );
+        return res.status(401).json({
+          exito: false,
+          err: {
+            msg: "No existe un Medico con este ID",
+          },
+        });
+      }
+    );
   }
 
   async crearMedico(req: any, res: Response) {

@@ -5,6 +5,17 @@ import jwt from "jsonwebtoken";
 import { verificarTokenGoogle } from "../helpers/googleverify";
 
 class LoginController {
+
+  renewToken(req: Request,res:Response){
+    const {usuario} =   req.body; 
+    let token = jwt.sign({ usuario }, `${process.env.SEED}`, {
+      expiresIn: process.env.CADUCIDAD_TOKEN,
+    });
+    res.json({
+      exito:true,
+      token
+    })
+  }
   async loginGoogle(req: Request, res: Response) {
     const { token } = req.body;
 

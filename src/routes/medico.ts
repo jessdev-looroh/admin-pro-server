@@ -24,11 +24,20 @@ medicoRouter.post(
   ],
   medicoController.crearMedico
 );
-medicoRouter.put("/:id", [], medicoController.actualizarMedico);
+medicoRouter.put("/:id", [
+  verificaToken,
+  check("nombre", "El nombre del medico es obligatorio").notEmpty(),
+  check("hospital", "El ID hospital es obligatorio").notEmpty(),
+  check(
+    "hospital",
+    "El ID hospital debe ser un ID valido de MONGO DB"
+  ).isMongoId(),
+  validarCampos,
+], medicoController.actualizarMedico);
 
 medicoRouter.delete(
   "/:id",
-  // verificaToken,
+  verificaToken,
   medicoController.eliminarMedico
 );
 
