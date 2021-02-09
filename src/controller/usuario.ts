@@ -1,46 +1,70 @@
 import { Request, Response } from "express";
 import Usuario from "../models/usuario";
 import bcrypt from "bcrypt";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 
 class UsuarioController {
   getUsuario(req: Request, res: Response) {
-    Usuario.find().exec((err, usuarios) => {
-      if (err) {
-        return res.status(500).json({
-          exito: false,
-          err,
+    let pagina = req.query.pagina || 1;
+    let limite = req.query.limite || 10;
+    pagina = Number(pagina);
+    limite = Number(limite);
+    let skip = 0;
+    pagina == 1 ? (skip = 0) : (skip = pagina * limite - limite);
+
+    Usuario.find()
+      .skip(skip)
+      .limit(limite)
+      .exec((err, usuarios) => {
+        if (err) {
+          return res.status(500).json({
+            exito: false,
+            err,
+          });
+        }
+
+        Usuario.countDocuments((err, count) => {
+          if (err) {
+            return res.json({
+              exito: false,
+              err,
+            });
+          }
+          res.json({
+            exito: true,
+            pagina,
+            limite,
+            totalRegistros: count,
+            usuarios,
+          });
         });
-      }
-      return res.status(201).json({
-        exito: true,
-        usuarios,
       });
-    });
   }
 
   eliminarUsuario(req: Request, res: Response) {
     const uid = req.params.id;
-    Usuario.findByIdAndUpdate(uid, { estado: false },{new:true}).exec((err, usuario) => {
-      if (err) {
-        return res.status(500).json({
+    Usuario.findByIdAndUpdate(uid, { estado: false }, { new: true }).exec(
+      (err, usuario) => {
+        if (err) {
+          return res.status(500).json({
+            exito: false,
+            err,
+          });
+        }
+        if (usuario)
+          return res.json({
+            exito: true,
+            msg: "El usuario ha sido eliminado correctamente!!",
+          });
+
+        return res.status(401).json({
           exito: false,
-          err,
+          err: {
+            msg: "No existe un usuario con este ID",
+          },
         });
       }
-      if (usuario)
-        return res.json({
-          exito: true,
-          msg : "El usuario ha sido eliminado correctamente!!"
-        });
-
-      return res.status(401).json({
-        exito: false,
-        err: {
-          msg: "No existe un usuario con este ID",
-        },
-      });
-    });
+    );
   }
 
   actualizarUsuario(req: Request, res: Response) {
@@ -110,7 +134,7 @@ class UsuarioController {
       return res.status(201).json({
         exito: true,
         usuarios: [usuarioDB],
-        token
+        token,
       });
     });
   }

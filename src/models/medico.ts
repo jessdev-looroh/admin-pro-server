@@ -1,6 +1,6 @@
 import { model, Schema } from "mongoose";
 
-const HospitalSchema = new Schema(
+const MedicoSchema = new Schema(
   {
     nombre: {
       type: String,
@@ -10,18 +10,23 @@ const HospitalSchema = new Schema(
       type: String,
     },
     usuario: {
-      required:true,
       type: Schema.Types.ObjectId,
       ref: "Usuario",
+      required:true
     },
-  },
-  { collection: "hospitales" }
+    hospital: {
+      type: Schema.Types.ObjectId,
+      ref: "Hospital",
+      required:true
+    },
+  }
+  
 );
 
-HospitalSchema.methods.toJSON = function () {
+MedicoSchema.methods.toJSON = function () {
   let objetc: any = this.toObject();
   let { __v, ...others } = objetc;
   return others;
 };
 
-export = model("Hospital", HospitalSchema);
+export = model("Medico", MedicoSchema);

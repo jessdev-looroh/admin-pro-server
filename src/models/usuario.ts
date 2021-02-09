@@ -34,7 +34,8 @@ const UsuarioSchema = new Schema({
 });
 
 UsuarioSchema.methods.toJSON = function () {
-  let { __v, _id, password , ...others } = this.toObject();
+  let objetc :any = this.toObject();
+  let { __v, _id, password , ...others } = objetc;
   others.uid = _id;
   return others;
 };
