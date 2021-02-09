@@ -1,13 +1,52 @@
 import { Request, Response } from "express";
 import Usuario from "../models/usuario";
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { verificarTokenGoogle } from "../helpers/googleverify";
 
 class LoginController {
+  async loginGoogle(req: Request, res: Response) {
+    const { token } = req.body;
+
+    try {
+      const { name, email, picture } = await verificarTokenGoogle(token);
+      const usuarioDB = await Usuario.findOne({ email });
+      let usuario: any;
+      if (!usuarioDB) {
+        usuario = new Usuario({
+          nombre: name,
+          email,
+          password: "@@@",
+          img: picture,
+          google: true,
+          estado: true,
+        });
+      } else {
+        //Existe usuario
+        usuario = usuarioDB;
+        usuario.google = true;
+      }
+
+      await usuario.save();
+      let token2 = jwt.sign({ usuario: usuarioDB }, `${process.env.SEED}`, {
+        expiresIn: process.env.CADUCIDAD_TOKEN,
+      });
+      return res.json({
+        exito: true,
+        usuario,
+        token:token2,
+      });
+    } catch (err) {
+      return res.status(401).json({
+        exito: false,
+        err,
+      });
+    }
+  }
   login(req: Request, res: Response) {
-    const {email,password} = req.body;
-    
-    Usuario.findOne({ email})
+    const { email, password } = req.body;
+
+    Usuario.findOne({ email })
       .populate("color", "descripcion codigo")
       .populate("pais", "nombre bandera monedaNombre monedaSimbolo codigoCell")
       .populate("ciudad", "nombre")

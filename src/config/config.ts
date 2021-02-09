@@ -35,3 +35,7 @@ process.env.CADUCIDAD_TOKEN = `72h`;
 // SEED de autenticacion
 // ==========================================
 process.env.SEED = process.env.SEED || "loorohdev-jess";
+
+
+process.env.GOOGLE_ID = "350714592245-dkjmldhevouvufdi2sluelvms7uue19k.apps.googleusercontent.com";
+process.env.GOOGLE_SECRET = "dong7HMlcjEFzRlzaNejvkC-";
