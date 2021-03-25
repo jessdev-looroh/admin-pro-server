@@ -12,7 +12,7 @@ class UsuarioController {
     let skip = 0;
     pagina == 1 ? (skip = 0) : (skip = pagina * limite - limite);
 
-    Usuario.find()
+    Usuario.find({estado:true})
       .skip(skip)
       .limit(limite)
       .exec((err, usuarios) => {
@@ -23,7 +23,7 @@ class UsuarioController {
           });
         }
 
-        Usuario.countDocuments((err, count) => {
+        Usuario.countDocuments({estado:true},(err, count) => {
           if (err) {
             return res.json({
               exito: false,
@@ -43,6 +43,7 @@ class UsuarioController {
 
   eliminarUsuario(req: Request, res: Response) {
     const uid = req.params.id;
+    
     Usuario.findByIdAndUpdate(uid, { estado: false }, { new: true }).exec(
       (err, usuario) => {
         if (err) {
@@ -67,11 +68,16 @@ class UsuarioController {
     );
   }
 
-  actualizarUsuario(req: Request, res: Response) {
-    const { nombre } = req.body;
+  actualizarUsuario(req: any, res: Response) {
+    let  newData = req.body;
+    const {usuario} = req;
     const uid = req.params.id;
+    if(usuario.google){
+      delete newData.email;
+    }
+    
 
-    Usuario.findByIdAndUpdate(uid, { nombre }, { new: true }).exec(
+    Usuario.findByIdAndUpdate(uid, newData, { new: true }).exec(
       (err, usuario) => {
         if (err) {
           return res.status(500).json({
@@ -79,10 +85,14 @@ class UsuarioController {
             err,
           });
         }
+        let token = jwt.sign({ usuario }, `${process.env.SEED}`, {
+          expiresIn: process.env.CADUCIDAD_TOKEN,
+        });
         if (usuario)
           return res.json({
             exito: true,
-            usuario,
+            usuarios:[usuario],  
+            token
           });
 
         return res.status(401).json({
@@ -111,7 +121,7 @@ class UsuarioController {
       return res.status(400).json({
         exito: false,
         err: {
-          msg: "Este correo ya esta registrado",
+          message: "Este correo ya esta registrado",
         },
       });
     }

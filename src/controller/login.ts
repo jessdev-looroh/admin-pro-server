@@ -6,13 +6,15 @@ import { verificarTokenGoogle } from "../helpers/googleverify";
 
 class LoginController {
 
-  renewToken(req: Request,res:Response){
-    const {usuario} =   req.body; 
+  async renewToken(req: any,res:Response){
+    const {uid} =   req.usuario;
+    let usuario = await Usuario.findById(uid);
     let token = jwt.sign({ usuario }, `${process.env.SEED}`, {
       expiresIn: process.env.CADUCIDAD_TOKEN,
     });
     res.json({
       exito:true,
+      usuarios:[usuario],
       token
     })
   }
@@ -39,12 +41,13 @@ class LoginController {
       }
 
       await usuario.save();
-      let token2 = jwt.sign({ usuario: usuarioDB }, `${process.env.SEED}`, {
+
+      let token2 = jwt.sign({ usuario}, `${process.env.SEED}`, {
         expiresIn: process.env.CADUCIDAD_TOKEN,
       });
       return res.json({
         exito: true,
-        usuario,
+        usuario:[usuario],
         token:token2,
       });
     } catch (err) {
@@ -89,7 +92,7 @@ class LoginController {
         });
         res.json({
           exito: true,
-          usuario: usuarioDB,
+          usuarios: [usuarioDB],
           token,
         });
       });

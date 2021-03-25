@@ -21,6 +21,25 @@ class MedicoController {
       });
   }
 
+  getMedicoID(req: Request, res: Response) {
+    const {id} = req.params;
+    Medico.findById(id)
+      .populate("hospital", "nombre img")
+      .populate("usuario", "nombre img")
+      .exec((err, medicos) => {
+        if (err) {
+          return res.status(500).json({
+            exito: false,
+            err,
+          });
+        }
+        return res.status(201).json({
+          exito: true,
+          medicos :[medicos],
+        });
+      });
+  }
+
   eliminarMedico(req: Request, res: Response) {
     const uid = req.params.id;
     Medico.findByIdAndRemove(uid).exec(
@@ -52,6 +71,7 @@ class MedicoController {
     const { nombre, hospital } = req.body;
     const uid = req.params.id;
 
+    console.log(nombre);
     Medico.findByIdAndUpdate(uid, { nombre, hospital }, { new: true }).exec(
       (err, medico) => {
         if (err) {
@@ -94,7 +114,7 @@ class MedicoController {
       }
       return res.status(201).json({
         exito: true,
-        Medicos: [medicoDB],
+        medicos: [medicoDB],
       });
     });
   }

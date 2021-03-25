@@ -10,6 +10,9 @@ medicoRouter.get(
   // verificaToken ,
   medicoController.getMedicos
 );
+
+
+
 medicoRouter.post(
   "/",
   [
@@ -40,5 +43,7 @@ medicoRouter.delete(
   verificaToken,
   medicoController.eliminarMedico
 );
+
+medicoRouter.get('/:id',verificaToken,medicoController.getMedicoID)
 
 export default medicoRouter;
